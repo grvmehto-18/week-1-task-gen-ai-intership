@@ -110,6 +110,4 @@ streamlit run src/streamlit_app/main_app.py
 
 ## Example Screenshots
 
-*(Placeholder for a screenshot of the main application page)*
-
-*(Placeholder for a screenshot of the chatbot in action)*
+![Screenshot](images/1.png)
