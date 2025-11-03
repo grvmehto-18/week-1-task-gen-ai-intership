@@ -1,145 +1,115 @@
+# Electric Vehicle Analysis and Chatbot
 
-# End-to-End Electric Vehicle (EV) Insights Dashboard
+This project is a Streamlit web application that provides analysis and a chatbot for electric vehicle data. It's designed with a modular and clean architecture, using Python, LangChain, and Streamlit.
 
-Welcome to the EV Insights Dashboard! This project is a complete end-to-end MLOPS mini-system designed to analyze the electric vehicle market. It provides functionalities for EV price prediction, in-depth exploratory data analysis (EDA), and an intelligent chatbot for querying the dataset.
+This is a week-wise task-based project. This is the result of the first week's task.
 
-This project is built with a clean, object-oriented architecture and is intended to be a practical learning resource for students and enthusiasts interested in MLOPS and data science.
+## Objective
 
-## 🚀 Features
+The main objective of this project is to build a web-based platform for exploring and chatting about electric vehicle data. The application is divided into several sections, including data analysis, predictions, and a chatbot.
 
--   **EV Price Prediction**: Predict the Base MSRP (Manufacturer's Suggested Retail Price) of an electric vehicle using machine learning.
-    -   Models: Simple Linear Regression and Random Forest Regressor.
-    -   Evaluation: View key performance metrics like MSE, MAE, R-squared, and RMSE.
--   **Exploratory Data Analysis (EDA)**: An interactive dashboard with various plots to visualize and understand the EV dataset.
-    -   Data distributions, correlations, and categorical analysis.
-    -   Visualizations are created using `matplotlib`.
--   **EV Chatbot**: A conversational AI, powered by LangChain and OpenAI, that can answer your questions about the EV dataset.
--   **Clean Architecture**: The project follows a modular, service-oriented architecture with clear separation of concerns, making it easy to understand and extend.
+## Architecture
 
-## 📂 Project Structure
-
-The project uses a `src` layout, which is a standard practice in modern Python projects. This helps in organizing the code in a clean and modular way.
-
-```
-.
-├── README.md
-├── requirements.txt
-└── src
-    ├── chatbot
-    │   └── chatbot_service.py
-    ├── datasets
-    │   └── ev_raw_data.csv
-    ├── ml_models
-    │   └── regression.py
-    ├── services
-    │   └── data_service.py
-    ├── streamlit_app
-    │   ├── main_app.py
-    │   └── pages
-    │       ├── 1_prediction.py
-    │       ├── 2_eda.py
-    │       └── 3_chatbot.py
-    └── utils
-        └── eda.py
-```
+The project follows a modular architecture to ensure clean, maintainable, and scalable code. The main components are:
 
 -   **`src/`**: The main source code directory.
-    -   **`chatbot/`**: Contains the `ChatbotService` for the LangChain-powered chatbot.
-    -   **`datasets/`**: Stores the raw data files.
-    -   **`ml_models/`**: Holds the regression model classes.
-    -   **`services/`**: Contains the `DataService` for data loading and processing.
-    -   **`streamlit_app/`**: The main Streamlit application, with each page in the `pages/` subdirectory.
-    -   **`utils/`**: Utility functions, such as the `EDAUtils` for generating plots.
--   **`requirements.txt`**: A list of all Python dependencies.
--   **`README.md`**: This file!
+    -   **`datasets/`**: Contains the raw data files.
+    -   **`llm_config/`**: Configures the language model and embeddings.
+    -   **`models/`**: Contains machine learning models.
+    -   **`services/`**: Contains the business logic of the application, such as the chatbot service.
+    -   **`streamlit_app/`**: Contains the Streamlit frontend application.
+        -   **`pages/`**: Contains the different pages of the Streamlit app.
+    -   **`utils/`**: Contains utility functions.
+    -   **`vectorstore/`**: Handles the creation and management of the vector store.
 
-## 🛠️ Setup and Installation
+## Folder Structure
 
-This project uses `uv` for package management, which is a fast and modern alternative to `pip` and `venv`.
+```
+/
+├───.gitignore
+├───README.md
+├───requirements.txt
+├───.venv2/
+└───src/
+    ├───llm_config/
+    │   └───__init__.py
+    │   └───llm_config.py
+    ├───models/
+    │   └───__init__.py
+    │   └───regression.py
+    ├───services/
+    │   ├───__init__.py
+    │   ├───chatbot_service.py
+    │   └───data_service.py
+    ├───utils/
+    │   ├───__init__.py
+    │   └───eda.py
+    ├───vectorstore/
+    │   ├───__init__.py
+    │   └───vectorstore_service.py
+    ├───streamlit_app/
+    │   ├───main_app.py
+    │   └───pages/
+    │       ├───1_prediction.py
+    │       ├───2_eda.py
+    │       └───3_chatbot.py
+    └───datasets/
+        └───ev_raw_data.csv
+```
 
-### Prerequisites
-
--   Python 3.8 or higher.
--   `uv` installed. If you don't have it, you can install it with:
-    ```bash
-    pip install uv
-    ```
-
-### Installation Steps
+## Setup and Installation
 
 1.  **Clone the repository:**
     ```bash
     git clone <repository-url>
-    cd <repository-name>
+    cd gen-ai-week-1-task
     ```
 
-2.  **Create a virtual environment and install dependencies:**
-    `uv` makes this a one-step process.
+2.  **Create a virtual environment:**
+    This project uses `uv` as a package manager, which is a fast alternative to `pip`.
+    First, install `uv`:
     ```bash
-    uv venv
-    uv pip install -r requirements.txt
+    pip install uv
     ```
-    This will create a `.venv` directory with all the necessary packages installed.
+    Then, create a virtual environment:
+    ```bash
+    uv venv .venv2
+    ```
 
 3.  **Activate the virtual environment:**
-    -   On macOS and Linux:
-        ```bash
-        source .venv/bin/activate
-        ```
-    -   On Windows:
-        ```bash
-        .venv\Scripts\activate
-        ```
-
-### 🤖 Configuring the Chatbot (Important!)
-
-The chatbot requires an OpenAI API key to function. This is managed using a `.env` file in the root of the project.
-
-1.  **Locate the `.env` file**: In the main project directory, you will find a file named `.env`.
-
-2.  **Add Your API Key**: Open the `.env` file and replace `"YOUR_API_KEY_HERE"` with your actual OpenAI API key.
-    ```
-    OPENAI_API_KEY="sk-..."
+    ```bash
+    source .venv2/bin/activate
     ```
 
-3.  **Get an API Key**: If you don't have one, you can get an API key from the [OpenAI Platform](https://platform.openai.com/account/api-keys).
+4.  **Install dependencies:**
+    ```bash
+    uv pip install -r requirements.txt
+    ```
 
-The application will automatically load the key from this file. Your key is kept secure on your local machine and is not shared.
+5.  **Set up OpenAI API Key:**
+    Create a file `.streamlit/secrets.toml` and add your OpenAI API key:
+    ```toml
+    [openai]
+    api_key = "YOUR_OPENAI_API_KEY"
+    ```
 
-## ▶️ How to Run the Application
+## How to Run
 
-Once you have completed the setup and activated the virtual environment, you can run the Streamlit application with a single command:
+To run the Streamlit application, execute the following command in the root directory of the project:
 
 ```bash
 streamlit run src/streamlit_app/main_app.py
 ```
 
-This will start the web server and open the EV Insights Dashboard in your default web browser.
+## Advantages of this Architecture
 
-## 📝 Sample Test Run Example
+-   **Modularity:** Each component has a specific responsibility, making the code easier to understand, test, and maintain.
+-   **Scalability:** The modular design allows for easy addition of new features and components without affecting the rest of the application.
+-   **Reusability:** Services and components can be easily reused in other parts of the application or in other projects.
+-   **Clean Code:** The separation of concerns leads to cleaner and more readable code.
 
-Here’s how you can interact with the application:
+## Example Screenshots
 
-1.  **Navigate to the Prediction Page**:
-    -   Select "Random Forest Regressor" from the dropdown.
-    -   Observe the performance metrics displayed.
-    -   Choose a `Make` (e.g., "TESLA"), a `Model` (e.g., "MODEL Y"), and an `Electric Vehicle Type`.
-    -   Enter an `Electric Range` (e.g., 300 miles).
-    -   Click the **"Predict Price"** button. The predicted MSRP will be displayed.
+*(Placeholder for a screenshot of the main application page)*
 
-2.  **Explore the EDA Page**:
-    -   Scroll through the page to see different visualizations of the dataset.
-    -   Analyze the distribution of EV prices, ranges, and the popularity of different makes.
-
-3.  **Chat with the Bot**:
-    -   Ensure you have added your OpenAI API key to the `.env` file as described in the configuration section.
-    -   Go to the **Chatbot** page.
-    -   Ask a question in the chat input, for example:
-        -   "What is the average electric range for TESLA cars?"
-        -   "Which car has the highest Base MSRP?"
-        -   "Tell me about the NISSAN Leaf."
-    -   The chatbot will provide an answer based on the dataset. You can expand the "See sources" section to see which data points were used to generate the answer.
-
----
-
-We hope you find this project useful and educational. Happy coding!
+*(Placeholder for a screenshot of the chatbot in action)*

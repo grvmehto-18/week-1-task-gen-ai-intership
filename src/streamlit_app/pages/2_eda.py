@@ -2,10 +2,11 @@
 import streamlit as st
 import pandas as pd
 import sys
-import os
+from pathlib import Path
 
-# Add the src directory to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+# Add the project root to the Python path
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.services.data_service import DataService
 from src.utils.eda import EDAUtils
@@ -37,11 +38,7 @@ st.write(df.describe())
 
 st.header("Visualizations")
 
-# Distribution of Range
-st.subheader("Distribution of Range (km)")
-with st.spinner("Generating plot..."):
-    fig = EDAUtils.plot_distribution(df, 'range')
-    st.pyplot(fig)
+
 
 # Distribution of Price (Germany)
 st.subheader("Distribution of Price (Germany, before incentives)")

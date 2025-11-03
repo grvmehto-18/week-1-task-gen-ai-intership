@@ -1,14 +1,15 @@
 import streamlit as st
 import pandas as pd
 import sys
-import os
+from pathlib import Path
 import numpy as np
 
-# Add the src directory to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+# Add the project root to the Python path
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.services.data_service import DataService
-from src.ml_models.regression import SimpleLinearRegressionModel, RandomForestRegressorModel
+from src.models.regression import SimpleLinearRegressionModel, RandomForestRegressorModel
 
 st.set_page_config(page_title="EV Price Prediction", page_icon="🔌")
 
@@ -76,8 +77,6 @@ with col1:
     selected_drive_config = st.selectbox("Drive Configuration", options=drive_config_options)
 
 with col2:
-    selected_range = st.slider("Range (km)", min_value=int(df_for_ui['range'].min()), max_value=int(df_for_ui['range'].max()), value=int(df_for_ui['range'].mean()))
-    selected_top_speed = st.slider("Top Speed (km/h)", min_value=int(df_for_ui['top_speed'].min()), max_value=int(df_for_ui['top_speed'].max()), value=int(df_for_ui['top_speed'].mean()))
     selected_battery = st.slider("Battery (kWh)", min_value=int(df_for_ui['battery'].min()), max_value=int(df_for_ui['battery'].max()), value=int(df_for_ui['battery'].mean()))
     selected_seats = st.selectbox("Number of Seats", options=sorted(df_for_ui['seats'].unique()))
 
@@ -87,8 +86,6 @@ if st.button("Predict Price"):
     input_data_dict = {col: 0 for col in features.columns}
     
     # Set the user-provided values
-    input_data_dict['range'] = selected_range
-    input_data_dict['top_speed'] = selected_top_speed
     input_data_dict['battery'] = selected_battery
     input_data_dict['seats'] = selected_seats
     

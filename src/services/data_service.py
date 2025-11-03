@@ -42,8 +42,6 @@ class DataService:
         """
         if self.df is None:
             self.load_data()
-        print(f"Initial shape: {self.df.shape}")
-
         print("Cleaning data...")
         # Rename columns to be more Python-friendly
         self.df.rename(columns={
@@ -65,27 +63,27 @@ class DataService:
         # Extract Make from title
         self.df['make'] = self.df['title'].apply(lambda x: x.split(' ')[0])
 
+        # Clean and convert 'price_de' to numeric
+        self.df['price_de'] = self.df['price_de'].replace('[^\d.]', '', regex=True).astype(float)
+
         # For the purpose of price prediction, we need 'price_de'. Rows without it are not useful.
         self.df.dropna(subset=['price_de'], inplace=True)
-        print(f"Shape after dropping rows with missing price_de: {self.df.shape}")
         
-        # Drop columns that are not useful for price prediction.
-        self.df.drop(['Row_ID', 'title', 'price_range', 'price_nl', 'price_uk'], axis=1, inplace=True)
-        print(f"Shape after dropping irrelevant columns: {self.df.shape}")
+        # Drop columns that are not useful for price prediction or are mostly empty.
+        self.df.drop(['Row_ID', 'title', 'price_range', 'price_nl', 'price_uk', 
+                      'acceleration_0_100', 'top_speed', 'range', 'efficiency', 'fastcharge'], axis=1, inplace=True)
 
         # Convert numerical columns from string to number, coercing errors
-        for col in ['battery', 'acceleration_0_100', 'top_speed', 'range', 'efficiency', 'fastcharge', 'towing_capacity']:
+        for col in ['battery', 'towing_capacity']:
             self.df[col] = pd.to_numeric(self.df[col], errors='coerce')
-        print(f"Shape after converting to numeric: {self.df.shape}")
 
         # Fill missing values with the mean for numerical columns
         for col in self.df.select_dtypes(include=np.number).columns:
-            self.df[col].fillna(self.df[col].mean(), inplace=True)
-        print(f"Shape after filling NaNs with mean: {self.df.shape}")
+            self.df[col] = self.df[col].fillna(self.df[col].mean())
         
-        # Drop rows with any remaining missing values in other key columns
-        self.df.dropna(inplace=True)
-        print(f"Shape after final dropna: {self.df.shape}")
+        # Fill missing values in categorical columns with the mode
+        for col in self.df.select_dtypes(include=['object']).columns:
+            self.df[col] = self.df[col].fillna(self.df[col].mode()[0])
 
         print("Data cleaning complete.")
         return self.df

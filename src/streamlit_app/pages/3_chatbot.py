@@ -1,79 +1,71 @@
-
 import streamlit as st
+import pandas as pd
 import sys
+from pathlib import Path
 import os
-from dotenv import load_dotenv
 
-# Add the src directory to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+# Add the project root to the Python path
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root))
 
-# Load environment variables from .env file
-load_dotenv()
+from src.services.chatbot_service import ChatbotService
 
-from src.services.data_service import DataService
-from src.chatbot.chatbot_service import ChatbotService
-
-st.set_page_config(page_title="EV Chatbot", page_icon="🤖")
-
-st.title("EV Chatbot")
-
-st.markdown("""
-Ask questions about the EV dataset. The chatbot will do its best to answer them based on the available data.
-""")
-
-# --- API Key Handling ---
-openai_api_key = os.getenv("OPENAI_API_KEY")
-
-if not openai_api_key or openai_api_key == "YOUR_API_KEY_HERE":
-    st.warning("Please add your OpenAI API key to the .env file in the project root.")
-    st.stop()
-
-@st.cache_resource
-def initialize_chatbot(api_key):
+def chatbot_page():
     """
-    Initializes the chatbot service.
-    Cache this to avoid re-initializing on every interaction.
+    Renders the chatbot page.
     """
-    try:
-        data_service = DataService(file_path='src/datasets/ev_raw_data.csv')
-        df = data_service.get_dataframe_for_eda()
-        return ChatbotService(dataframe=df, openai_api_key=api_key)
-    except Exception as e:
-        st.error(f"Failed to initialize chatbot: {e}")
-        return None
+    st.title("EV Chatbot")
 
-chatbot_service = initialize_chatbot(openai_api_key)
+    # Input fields for API key, model name, and base URL
+    with st.sidebar:
+        st.header("API Configuration")
+        openai_api_key = st.text_input("OpenAI API Key", type="password")
+        model_name = st.text_input("Model Name", value="deepseek/deepseek-chat-v3.1:free")
+        base_url = st.text_input("Base URL (e.g., OpenRouter)", value="https://openrouter.ai/api/v1")
 
-if chatbot_service is None:
-    st.stop()
+        if not openai_api_key:
+            st.warning("Please enter your OpenAI API Key to use the chatbot.")
+            st.stop()
 
-# --- Chat Interface ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    # Load data
+    @st.cache_data
+    def load_data():
+        """
+        Loads the EV raw data from the CSV file.
+        """
+        return pd.read_csv("src/datasets/ev_raw_data.csv")
 
-if prompt := st.chat_input("What would you like to know?"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    df = load_data()
 
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            try:
-                response = chatbot_service.ask_question(prompt)
-                result = response.get('result', "I couldn't find an answer.")
-                st.markdown(result)
-                
-                # Optionally display source documents
-                with st.expander("See sources"):
-                    st.write(response.get('source_documents', "No sources found."))
-                
-                st.session_state.messages.append({"role": "assistant", "content": result})
+    # Initialize chatbot service
+    @st.cache_resource
+    def load_chatbot_service(api_key: str, model: str, url: str):
+        """
+        Initializes and caches the ChatbotService.
+        """
+        return ChatbotService(df, api_key, model, url)
 
-            except Exception as e:
-                error_message = f"An error occurred: {e}"
-                st.error(error_message)
-                st.session_state.messages.append({"role": "assistant", "content": error_message})
+    chatbot = load_chatbot_service(openai_api_key, model_name, base_url)
+
+    # Chat interface
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("Ask a question about electric vehicles"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                response = chatbot.ask_question(prompt)
+                st.markdown(response["answer"])
+        st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
+
+if __name__ == "__main__":
+    chatbot_page()

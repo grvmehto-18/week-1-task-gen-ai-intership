@@ -1,25 +1,35 @@
+"""
+Streamlit Main App
+This is the main entry point for the Streamlit application.
+It sets up the main page and navigation.
+"""
 import streamlit as st
+import sys
+from pathlib import Path
 
-st.set_page_config(
-    page_title="EV Insights Dashboard",
-    page_icon="🚗",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+# Add the project root to the Python path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
-st.title("Electric Vehicle (EV) Insights Dashboard")
+def main():
+    """
+    Main function to run the Streamlit app.
+    """
+    st.set_page_config(
+        page_title="EV Analysis and Chatbot",
+        page_icon="🚗",
+        layout="wide",
+    )
 
-st.markdown("""
-Welcome to the EV Insights Dashboard! This platform is designed to provide a comprehensive analysis of the electric vehicle market.
-You can navigate through different sections using the sidebar to explore various aspects of our project.
+    st.sidebar.title("Navigation")
+    st.sidebar.info(
+        """
+        Select a page from the dropdown above to navigate to different sections of the app.
+        """
+    )
 
-### 📄 Pages:
-- **Prediction**: Predict the price of an electric vehicle based on its features.
-- **EDA (Exploratory Data Analysis)**: Visualize the EV dataset with various plots and statistical summaries.
-- **Chatbot**: Ask questions about the EV dataset and get answers from our intelligent chatbot.
+    st.title("Electric Vehicle Analysis and Chatbot")
+    st.write("Welcome to the EV Analysis and Chatbot app. Please select a page from the sidebar to get started.")
 
-### 🚀 Getting Started
-Select a page from the sidebar to begin your exploration.
-""")
-
-# You can add more global configurations or introductory text here.
+if __name__ == "__main__":
+    main()
