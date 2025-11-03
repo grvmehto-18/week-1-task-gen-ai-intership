@@ -1,0 +1,11 @@
+
+pandas
+scikit-learn
+matplotlib
+streamlit
+langchain
+langchain-openai
+faiss-cpu
+tiktoken
+uv
+python-dotenv
